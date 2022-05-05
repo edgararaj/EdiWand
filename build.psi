@@ -1,0 +1,55 @@
+#!./build.py
+
+import os
+
+prj_name = "EdiWand"
+
+if os.name == "nt":
+    if not which("cl"):
+        print_error("ERROR: 'cl' not found - please run this from the MSVC x64 native tools command prompt.")
+        exit(1)
+
+    if os.getenv("Platform") != "x64":
+        print_error("ERROR: Platform is not 'x64' - please run this from the MSVC x64 native tools command prompt.")
+        exit(1)
+
+def compile():
+    bat {
+        cl {common_compiler_flags} {src_dir}main.cpp -Fm{prj_name} -Fe{prj_name} -link {common_linker_flags}
+    }
+    sh {
+        gcc main.cpp
+    }
+    return not error_code
+
+src_dir = f"{script_dir}/src/"
+if "debug" in argv:
+    build_dir=f"{script_dir}/build_debug/"
+    print("Building debug version...")
+else:
+    build_dir=f"{script_dir}/build_release/"
+
+common_compiler_flags = "-nologo -GR- -Gm- -EHa- -Oi -WX -W4 -wd4100 -wd4201 -wd4189 -wd4701 -std:c++latest -utf-8 -D_CRT_SECURE_NO_WARNINGS"
+if "debug" in argv:
+    common_compiler_flags += " -Od -Zi -D_DEBUG"
+else:
+    common_compiler_flags += " -O2"
+
+common_linker_flags = "-opt:ref -incremental:no -subsystem:console -nodefaultlib kernel32.lib user32.lib dwmapi.lib libucrt.lib libvcruntime.lib libcmt.lib ws2_32.lib"
+
+if exists(build_dir):
+    if not rd(build_dir):
+        exit(1)
+
+if not exists(build_dir):
+    mkdir(build_dir)
+
+    with cd(build_dir):
+        if not compile():
+            print_error("Failed to compile!")
+        else:
+            print_success("Compiled sucessfully")
+            if "run" in argv:
+                bat {
+                    {build_dir}/{prj_name}.exe
+                }

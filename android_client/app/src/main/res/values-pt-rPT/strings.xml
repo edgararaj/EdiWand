@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EdiWand</string>
+    <string name="add_computer">Please download the EdiWand App from https://arroz.com and start it on your computer. Ensure that the computer and this android device are connected to the same WiFi network.</string>
+    <string name="connecting">Conectando…</string>
+    <string name="connection_failed">Falha na conexão!</string>
+</resources>
